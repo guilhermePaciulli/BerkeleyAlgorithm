@@ -3,15 +3,18 @@ import sys
 import re
 import time
 import threading
+from socket import error as socket_error
 
 class Server:
 
-    def __init__(self, masterIP, time, d, slavesfile, logfile):
-        ip_port = re.split(":", masterIP)
-        ip = ip_port[0] # the master's listening IP
-        port = int(ip_port[1]) # the master's listening port
-        self.slave_socket = socket.socket() # Creating socket
-        self.slave_socket.bind((ip, port)) # Binding to given IP and port
+    def __init__(self, addr, time, d, slavesfile, logfile):
+        ip_port = re.split(":", addr)
+        self.ip = ip_port[0] # the master's listening IP
+        self.port = int(ip_port[1]) # the master's listening port
+        # Creating socket that can both receive and send packages
+        self.slave_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.slave_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.slave_socket.bind((self.ip, self.port)) # Binding to given IP and port
         self.time = time
         self.d = d
         self.slaves = self._read_slaves_file(slavesfile)
@@ -21,16 +24,26 @@ class Server:
         self.slave_socket.listen(10) # Start listening up to 10 connections
         self._log("SERVER LISTENING AT "+self.ip+":"+str(self.port))
         while True:
+            times = []
+            for slave in self.slaves:
+                t = self._receive_time( slave[0], slave[1])
+                if t != -1:
+                    self._log("RECEIVED FROM CLIENT "+ slave[0]+":"+str(slave[1])+" THE TIME "+str(t))
+                    times.append(t)
+            time.sleep(5) # updates clocks every 5 seconds
 
-           time.sleep(5) # updates clocks every 5 seconds
-
-    # thread function used to receive clock time from a connected client
-    def start_receiving_time(self):
-        while True:
-            # recieve clock time
-            clock_time_string = self.slave_socket.recv(1024).decode()
-            clock_time = parser.parse(clock_time_string)
-            clock_time_diff = datetime.datetime.now() - clock_time
+    # function used to receive clock time from a connected client
+    def _receive_time(self, ip, port):
+        soc = socket.socket() # create socket  to connect to client
+        try:
+            soc.connect((ip, port)) # attempt to open connection
+            soc.send("request_time") # send request
+            time = int(soc.recv(1024).decode()) # receive clock time
+            return time
+        except socket_error as serr:
+            # if fails logs that the client is down
+            self._log("CLIENT "+ip+":"+str(port)+" IS DOWN")
+            return -1
 
     # reads the slaves file and returns a list with all ips and ports of
     # the slaves
