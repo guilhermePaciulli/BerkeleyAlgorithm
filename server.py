@@ -25,11 +25,22 @@ class Server:
         self._log("SERVER LISTENING AT "+self.ip+":"+str(self.port))
         while True:
             times = []
+
             for slave in self.slaves:
-                t = self._receive_time( slave[0], slave[1])
+                t = self._receive_time(slave[0], slave[1])
                 if t != -1:
                     self._log("RECEIVED FROM CLIENT "+ slave[0]+":"+str(slave[1])+" THE TIME "+str(t))
                     times.append(t)
+            # removing those who don't respect the d tolerance
+            filtered_times = list(filter(lambda tim: abs(self.time - tim) < self.d, times))
+            if len(filtered_times) > 0: # no connections, no time update
+                # calculating difference for each time obtained
+                filtered_times = map(lambda tim: self.time - tim, filtered_times)
+                avg = sum(filtered_times) / len(filtered_times) # calculating average
+                self._log("UPDATED TIME AVERAGE TO "+str(avg))
+            else:
+                self._log("TIME UPDATE WAS IMPOSSIBLE DUE TO LACK OF VALID CLIENTS")
+
             time.sleep(5) # updates clocks every 5 seconds
 
     # function used to receive clock time from a connected client
