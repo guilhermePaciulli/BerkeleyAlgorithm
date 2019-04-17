@@ -33,13 +33,14 @@ class Server:
                     times.append(t)
             # removing those who don't respect the d tolerance
             filtered_times = list(filter(lambda tim: abs(self.time - tim) < self.d, times))
-            if len(filtered_times) > 0: # no connections, no time update
-                # calculating difference for each time obtained
-                filtered_times = map(lambda tim: self.time - tim, filtered_times)
-                avg = sum(filtered_times) / len(filtered_times) # calculating average
-                self._log("UPDATED TIME AVERAGE TO "+str(avg))
-            else:
-                self._log("TIME UPDATE WAS IMPOSSIBLE DUE TO LACK OF VALID CLIENTS")
+            # calculating difference for each time obtained
+            filtered_times = map(lambda tim: self.time - tim, filtered_times)
+            # calculating average, the + 1 represents the master's time
+            avg = sum(filtered_times) / (len(filtered_times) + 1)
+            self._log("UPDATED TIME AVERAGE TO "+str(avg))
+
+            for slave in self.slaves:
+                self._send_time(slave[0], slave[1], avg)
 
             time.sleep(5) # updates clocks every 5 seconds
 
@@ -53,7 +54,17 @@ class Server:
             return time
         except socket_error as serr:
             # if fails logs that the client is down
-            self._log("CLIENT "+ip+":"+str(port)+" IS DOWN")
+            self._log("CLIENT "+ip+":"+str(port)+" IS DOWN, REQUEST FAILED")
+            return -1
+
+    def _send_time(self, ip, port, avg):
+        soc = socket.socket() # create socket  to connect to client
+        try:
+            soc.connect((ip, port)) # attempt to open connection
+            soc.send("update_time:"+str(avg)) # send request
+        except socket_error as serr:
+            # if fails logs that the client is down
+            self._log("CLIENT "+ip+":"+str(port)+" IS DOWN, UPDATE FAILED")
             return -1
 
     # reads the slaves file and returns a list with all ips and ports of
@@ -73,5 +84,5 @@ class Server:
         return slaves
 
     def _log(self, log):
-        print log
-        self.logfile.write(log)
+        print log + "\n"
+        self.logfile.write(log + "\n")

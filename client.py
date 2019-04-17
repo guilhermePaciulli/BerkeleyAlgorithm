@@ -23,8 +23,13 @@ class Client:
             if msg == "request_time": # if master is requesting for time
                 c.send(str(self.time)) # sends time
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
+            else:
+                avg = int(re.split(":", msg)[1])
+                self._log("TIME UPDATED FROM "+str(self.time))
+                self.time += avg
+                self._log("TO "+str(self.time))
             c.close()
 
     def _log(self, log):
-        print log
-        self.logfile.write(log)
+        print log + "\n"
+        self.logfile.write(log + "\n")
