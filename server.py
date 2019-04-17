@@ -24,23 +24,27 @@ class Server:
         self.slave_socket.listen(10) # Start listening up to 10 connections
         self._log("SERVER LISTENING AT "+self.ip+":"+str(self.port))
         while True:
-            times = []
-
+            # requesting to all slaves their times
             for slave in self.slaves:
-                t = self._receive_time(slave[0], slave[1])
-                if t != -1:
-                    self._log("RECEIVED FROM CLIENT "+ slave[0]+":"+str(slave[1])+" THE TIME "+str(t))
-                    times.append(t)
-            # removing those who don't respect the d tolerance
-            filtered_times = list(filter(lambda tim: abs(self.time - tim) < self.d, times))
+                t = self._receive_time(slave.ip, slave.port)
+                # updating slave time
+                slave.time = t
+            # removing those who don't respect the d tolerance and were
+            # obtained (time != -1)
+            f = lambda s: s.time != -1 and abs(self.time - s.time) < self.d
+            filt_slaves = list(filter(f, self.slaves))
             # calculating difference for each time obtained
-            filtered_times = map(lambda tim: self.time - tim, filtered_times)
+            filt_slaves = map(lambda s: self.time - s.time, filt_slaves)
+            # getting the times in a list
+            list_times = map(lambda s: filt_slaves.time)
             # calculating average, the + 1 represents the master's time
-            avg = sum(filtered_times) / (len(filtered_times) + 1)
+            avg = sum(list_times) / (len(list_times) + 1)
+            # updating master's time
+            self.time += avg
             self._log("UPDATED TIME AVERAGE TO "+str(avg))
 
-            for slave in self.slaves:
-                self._send_time(slave[0], slave[1], avg)
+            for slave in filt_slaves:
+                self._send_time(slave.ip, slave.port, avg)
 
             time.sleep(5) # updates clocks every 5 seconds
 
@@ -51,6 +55,8 @@ class Server:
             soc.connect((ip, port)) # attempt to open connection
             soc.send("request_time") # send request
             time = int(soc.recv(1024).decode()) # receive clock time
+            self._log("RECEIVED FROM CLIENT "+ slave.ip+":"+str(slave.port)
+                     +" THE TIME "+str(slave.time))
             return time
         except socket_error as serr:
             # if fails logs that the client is down
@@ -61,7 +67,7 @@ class Server:
         soc = socket.socket() # create socket  to connect to client
         try:
             soc.connect((ip, port)) # attempt to open connection
-            soc.send("update_time:"+str(avg)) # send request
+            soc.send("update_time:"+str(avg)) # send request to update time
         except socket_error as serr:
             # if fails logs that the client is down
             self._log("CLIENT "+ip+":"+str(port)+" IS DOWN, UPDATE FAILED")
@@ -75,14 +81,19 @@ class Server:
 
         for line in file.readlines():
             ipPort = re.split(":", line)
-            # the list is a list of lists, each list has the first argument as
-            # the IP and the second the port
-            slaves.append([ipPort[0], int(ipPort[1])])
+            # the list is instances of the Slave class with port, ip and time
+            # the time is not yet defined
+            slaves.append(Slave(ipPort[0], int(ipPort[1])))
 
         file.close()
-        print slaves
         return slaves
 
     def _log(self, log):
-        print log + "\n"
+        print log
         self.logfile.write(log + "\n")
+
+class Slave:
+    def __init__(self, ip, port):
+        self.ip = ip
+        self.port = port
+        self.time = -1

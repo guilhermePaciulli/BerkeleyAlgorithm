@@ -25,11 +25,11 @@ class Client:
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
             else:
                 avg = int(re.split(":", msg)[1])
-                self._log("TIME UPDATED FROM "+str(self.time))
                 self.time += avg
-                self._log("TO "+str(self.time))
+                # self._log("TIME UPDATED TO "+str(self.time))
+                self._log("UPDATE RECEIVED "+str(avg))
             c.close()
 
     def _log(self, log):
-        print log + "\n"
+        print log
         self.logfile.write(log + "\n")
