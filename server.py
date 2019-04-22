@@ -41,17 +41,25 @@ class Server:
             # obtained (time != -1)
             f = lambda s: s.time != -1 and abs(self.time - s.time) < self.d
             filt_slaves = list(filter(f, self.slaves))
-            # calculating difference for each time obtained
+            # calculating difference for each time obtained, the appended 0
+            # represents the master's time
             times = map(lambda s: self.time - s.time, filt_slaves)
+            times.append(0)
             # calculating average, the + 1 represents the master's time
-            avg = sum(times) / (len(times) + 1)
-            # updating master's time
-            self.time += avg
-            self._log("UPDATED TIME, AVERAGE IS "+str(avg))
+            avg = sum(times) / len(times)
+            # updating master's time, only updates if the average is different
+            # than zero
+            if avg !=0:
+                self._log("NEW AVERAGE OF "+str(avg)+" OBTAINED")
+                self._log("OLD TIME IS "+str(self.time)+" OBTAINED")
+                self.time += avg
+                self._log("UPDATED TIME IS "+str(self.time))
 
-            # updating clients' time
-            for slave in filt_slaves:
-                self._send_time(slave, avg)
+                # updating clients' time
+                for slave in filt_slaves:
+                    self._send_time(slave, self.time)
+            else:
+                self._log("NOTHING TO UPDATE")
 
             # waiting 5 seconds before next update
             time.sleep(5)
@@ -67,12 +75,15 @@ class Server:
             soc.send("request_time")
             # receiving clock time
             time = int(soc.recv(1024).decode())
-            self._log("RECEIVED FROM CLIENT "+ slave.ip+":"+str(slave.port)
+            slave.time = time
+            self._log("RECEIVED FROM CLIENT "+slave.ip+":"+str(slave.port)
                      +" THE TIME "+str(slave.time))
+            soc.close()
             return time
         except socket_error as serr:
             # if fails to connect to client, logs that the client is down
             self._log("CLIENT "+slave.ip+":"+str(slave.port)+" IS DOWN, REQUEST FAILED")
+            soc.close()
             return -1
 
     # function used to send average to slaves

@@ -36,11 +36,11 @@ class Client:
             else: # if not
                 # master is providing average to update this slave instance
                 # and so, we split the message in order to get the time
-                avg = int(re.split(":", msg)[1])
+                newTime = int(re.split(":", msg)[1])
                 # updating time in user
-                self.time += avg
+                self.time = newTime
                 # self._log("TIME UPDATED TO "+str(self.time))
-                self._log("UPDATE RECEIVED "+str(avg))
+                self._log("UPDATE RECEIVED "+str(newTime))
             # closes connection to master
             c.close()
 
