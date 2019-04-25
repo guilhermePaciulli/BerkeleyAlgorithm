@@ -16,6 +16,13 @@
         7. Por último, antes da próxima iteração, o master espera 5 segundos para requisitar tudo novamente.
     - No caso do slave: 
         1. ele lê os argumentos na seguinte ordem: endereço que o slave ficará escutando, o tempo atual dele e um arquivo para escrever os logs.
+        2. o módulo passa esses argumentos para uma função que instancia um Client e automaticamente começa o processo executando o método run() da classe Client.
+        3. Ao instanciar um client com esses argumentos, ele define como propriedades da instância o ip e a porta de escuta pela qual o master se comunicará com o slave dividindo uma string por ':' do tipo ip.ip.ip:port e fazendo os devidos casts, depois já se cria o socket que escutará nessa porta e ip faz-se o bind necessário, define-se o tempo atual do client e por último abre-se o arquivo de logs do client em questão.
+        4. A rotina de run() é bem simples, ela primeiro começa escutar o socket que o master se conectará e começa por um tempo indeterminado um loop. Cada iteração desse loop espera pela conexão do master, quando atingida tenta decodificar a mensagem que ele envia.
+        5. Se essa mensagem for ```"request_time"``` o slave apenas manda seu tempo e faz o log com essa informação e depois fecha a conexão.
+        6. Senão deduz-se que essa mensagem seja de atualização de tempo. Para tal o slave faz o log do tempo antigo, pega a mensagem recebida, divide ela por ':' e pega o segundo valor (referente ao tempo do master) e define seu valor como este (fazendo-se os devidos casts). Depois faz o log com o novo tempo e fecha a conexão.
+    - Notas:
+        * Ambos têm um mecanismo de tanto fazer os logs no arquivo em questão quanto na tela do command prompt para tal implementou-se uma função nos dois que faz isso com o nome de ```def _log(self, log):```.
 
 ## Teste
 Detalhes do teste:
