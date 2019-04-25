@@ -38,18 +38,18 @@ class Server:
                 # updating slave time
                 slave.time = t
             # removing those who don't respect the d tolerance and were
-            # obtained (time != -1)
+            # reachable (time != -1)
             f = lambda s: s.time != -1 and abs(s.time - self.time) < self.d
             filt_slaves = list(filter(f, self.slaves))
             # calculating difference for each time obtained, the appended 0
             # represents the master's time
             times = map(lambda s: s.time - self.time, filt_slaves)
             times.append(0)
-            # calculating average, the + 1 represents the master's time
+            # calculating average
             avg = sum(times) / len(times)
             # updating master's time, only updates if the average is different
             # than zero
-            if avg !=0:
+            if avg != 0:
                 self._log("NEW AVERAGE OF "+str(avg)+" OBTAINED")
                 self._log("OLD TIME IS "+str(self.time))
                 self.time += avg
@@ -87,14 +87,14 @@ class Server:
             return -1
 
     # function used to send average to slaves
-    def _send_time(self, slave, avg):
+    def _send_time(self, slave, time):
         # creating socket  to connect to client
         soc = socket.socket()
         try:
             # attempting to open connection
             soc.connect((slave.ip, slave.port))
             # sending request to update time
-            soc.send("update_time:"+str(avg))
+            soc.send("update_time:"+str(time))
         except socket_error as serr:
             # if fails to connect to client, logs that the client is down
             self._log("CLIENT "+slave.ip+":"+str(slave.port)+" IS DOWN, UPDATE FAILED")
