@@ -117,8 +117,8 @@ class Server:
         return slaves
 
     def _log(self, log):
-        print log
-        self.logfile.write(log + "\n")
+        print "[MASTER]" + log
+        self.logfile.write("[MASTER] " + log + "\n")
 
 class Slave:
     def __init__(self, ip, port):

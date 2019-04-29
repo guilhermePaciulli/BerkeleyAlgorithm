@@ -47,5 +47,5 @@ class Client:
 
     # logs both to command prompt and to logfile
     def _log(self, log):
-        print log
-        self.logfile.write(log + "\n")
+        print "[SLAVE "+self.ip+":"+str(self.port)+"] " + log
+        self.logfile.write("[SLAVE "+self.ip+":"+str(self.port)+"] " + log + "\n")
