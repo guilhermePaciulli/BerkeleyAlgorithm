@@ -16,9 +16,9 @@ master = threading.Thread(target=startAsServer, args = ("127.0.0.1:8080", 185, 1
 master.daemon = True
 
 if __name__ == '__main__':
-    try:
+    try: # starts each thread
         slave_1.start()
-        time.sleep(1)
+        time.sleep(1) # waits a second between threads to wait for them to complete the starting process
         slave_2.start()
         time.sleep(1)
         slave_3.start()
