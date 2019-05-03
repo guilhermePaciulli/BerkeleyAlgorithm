@@ -27,4 +27,4 @@ if __name__ == '__main__':
         while True:
             time.sleep(100) # maintain this thread execution alive while others are alive
     except (KeyboardInterrupt, SystemExit): # handles keyboard interruption (a.k.a. ctrl+c)
-        print "\nEXITING TEST"
+        print("\nEXITING TEST")

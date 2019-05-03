@@ -32,4 +32,4 @@ if __name__ == '__main__':
 
         startAsClient(addr, time, logfile)
     else:
-        print "ARGUMENTS ERROR"
+        print("ARGUMENTS ERROR")

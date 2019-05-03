@@ -117,7 +117,7 @@ class Server:
         return slaves
 
     def _log(self, log):
-        print "[MASTER]" + log
+        print("[MASTER]" + log)
         self.logfile.write("[MASTER] " + log + "\n")
 
 class Slave:
