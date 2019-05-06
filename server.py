@@ -67,7 +67,8 @@ class Server:
     # function used to receive clock time from a connected client
     def _receive_time(self, slave):
         # creating socket to connect to client
-        soc = socket.socket()
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             # attempting to open connection
             soc.connect((slave.ip, slave.port))
@@ -90,12 +91,13 @@ class Server:
     # function used to send average to slaves
     def _send_time(self, slave, time):
         # creating socket  to connect to client
-        soc = socket.socket()
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             # attempting to open connection
             soc.connect((slave.ip, slave.port))
             # sending request to update time
-            soc.send("update_time:"+str(time))
+            soc.send(b("update_time:"+str(time)))
         except socket_error as serr:
             # if fails to connect to client, logs that the client is down
             self._log("CLIENT "+slave.ip+":"+str(slave.port)+" IS DOWN, UPDATE FAILED")
