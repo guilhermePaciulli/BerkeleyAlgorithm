@@ -43,7 +43,7 @@ class Server:
             filt_slaves = list(filter(f, self.slaves))
             # calculating difference for each time obtained, the appended 0
             # represents the master's time
-            times = map(lambda s: s.time - self.time, filt_slaves)
+            times = list(map(lambda s: s.time - self.time, filt_slaves))
             times.append(0)
             # calculating average
             avg = sum(times) / len(times)
