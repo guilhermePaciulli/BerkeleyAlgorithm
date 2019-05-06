@@ -32,7 +32,7 @@ class Client:
             # if master is requesting for time
             if msg == "request_time":
                 # sends current time
-                c.send(str(self.time))
+                c.send(b(self.time))
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
             else: # if not
                 self._log("OLD TIME IS "+str(self.time))
