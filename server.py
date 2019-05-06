@@ -73,7 +73,7 @@ class Server:
             # attempting to open connection
             soc.connect((slave.ip, slave.port))
             # sending request
-            soc.send(b"request_time")
+            soc.send("request_time".encode())
             # receiving clock time
             msg = soc.recv(1024).decode()
             time = int(msg)

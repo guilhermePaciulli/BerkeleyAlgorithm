@@ -27,9 +27,10 @@ class Client:
         while True:
             # accepts master's connection
             c, addr = self.master_socket.accept()
+            print("HELLO WORLD!")
             # receives and decodes message
             msg = c.recv(1024).decode()
-            print(msg)
+            print(msg+"asdasdasd")
             # if master is requesting for time
             if msg == "request_time":
                 # sends current time
