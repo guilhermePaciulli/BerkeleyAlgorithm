@@ -26,18 +26,13 @@ class Client:
         self._log("CLIENT LISTENING TO MASTER AT "+self.ip+":"+str(self.port))
         while True:
             # accepts master's connection
-            print("HELLO WORLD! 2")
-            whatever = self.master_socket.accept()
-            print(whatever)
-            c, addr = whatever
-            print("HELLO WORLD!")
+            c, addr = self.master_socket.accept()
             # receives and decodes message
             msg = c.recv(1024).decode()
-            print(msg+"asdasdasd")
             # if master is requesting for time
             if msg == "request_time":
                 # sends current time
-                c.send(b(self.time))
+                c.send(str(self.time).encode())
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
             else: # if not
                 self._log("OLD TIME IS "+str(self.time))
