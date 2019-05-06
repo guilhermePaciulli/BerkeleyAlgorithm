@@ -26,6 +26,7 @@ class Client:
         self._log("CLIENT LISTENING TO MASTER AT "+self.ip+":"+str(self.port))
         while True:
             # accepts master's connection
+            print("HELLO WORLD! 2")
             c, addr = self.master_socket.accept()
             print("HELLO WORLD!")
             # receives and decodes message
