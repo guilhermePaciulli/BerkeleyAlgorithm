@@ -1,1 +1,1 @@
-python ../main.py -s 127.0.0.1:9000 175 logs/slave_log_1.txt
+python ../main.py -s 0.0.0.0:3000 175 logs/slave_log_1.txt
