@@ -27,7 +27,9 @@ class Client:
         while True:
             # accepts master's connection
             print("HELLO WORLD! 2")
-            c, addr = self.master_socket.accept()
+            whatever = self.master_socket.accept()
+            print(whatever)
+            c, addr = whatever
             print("HELLO WORLD!")
             # receives and decodes message
             msg = c.recv(1024).decode()
