@@ -97,7 +97,7 @@ class Server:
             # attempting to open connection
             soc.connect((slave.ip, slave.port))
             # sending request to update time
-            soc.send(b("update_time:"+str(time)))
+            soc.send(("update_time:"+str(time)).encode())
         except socket_error as serr:
             # if fails to connect to client, logs that the client is down
             self._log("CLIENT "+slave.ip+":"+str(slave.port)+" IS DOWN, UPDATE FAILED")
