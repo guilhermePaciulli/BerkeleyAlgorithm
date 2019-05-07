@@ -76,12 +76,16 @@ class Server:
             soc.send("request_time".encode())
             # receiving clock time
             msg = soc.recv(1024).decode()
-            time = int(msg)
-            slave.time = time
-            self._log("RECEIVED FROM CLIENT "+slave.ip+":"+str(slave.port)
-                     +" THE TIME "+str(slave.time))
-            soc.close()
-            return time
+            if msg.isdigit(): # handles errors
+                time = int(msg)
+                slave.time = time
+                self._log("RECEIVED FROM CLIENT "+slave.ip+":"+str(slave.port)
+                         +" THE TIME "+str(slave.time))
+                soc.close()
+                return time
+            else:
+                self._log("INVALID TIME RECEIVED FROM CLIENT "+slave.ip+":"+str(slave.port))
+                return -1
         except socket_error as serr:
             # if fails to connect to client, logs that the client is down
             self._log("CLIENT "+slave.ip+":"+str(slave.port)+" IS DOWN, REQUEST FAILED")

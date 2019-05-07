@@ -35,13 +35,16 @@ class Client:
                 c.send(str(self.time).encode())
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
             else: # if not
-                self._log("OLD TIME IS "+str(self.time))
-                # master is providing average to update this slave instance
-                # and so, we split the message in order to get the time
                 newTime = int(re.split(":", msg)[1])
-                # updating time in user
-                self.time = newTime
-                self._log("UPDATED TIME TO "+str(newTime))
+                if len(newTime) == 2: # handles errors
+                    self._log("OLD TIME IS "+str(self.time))
+                    # master is providing average to update this slave instance
+                    # and so, we split the message in order to get the time
+                    # updating time in user
+                    self.time = newTime
+                    self._log("UPDATED TIME TO "+str(newTime))
+                else:
+                    self._log("INVALID TIME RECEIVED FROM MASTER")
             # closes connection to master
             c.close()
 
