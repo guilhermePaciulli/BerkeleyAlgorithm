@@ -46,7 +46,7 @@ Detalhes do teste:
         - Slave  127.0.0.1:9001 com tempo 180
         - Slave  127.0.0.1:9002 com tempo 205 (não mudou pois fugiu da falha)
 
-* Arquivos:
+### Teste local:
     - Bash exec.sh executa o processo inteiro, executando o exec.py.
 
     - O exec.py instancia quatro threads (os 3 slaves e o master) e espera indefinidamente a execução de todos. Esse arquivo utiliza para cada thread a flag Daemon para criar dependência das threads com a thread do exec.py.
@@ -57,5 +57,11 @@ Detalhes do teste:
 
     - Os resultados com os prints de cada slave e do master deste teste encontram-se em /test/results.
 
-* Atenção:
-    - **o bash e o exec.main não podem ser movidos pois usam execução relativa de suas pastas.**
+### Teste em máquinas virtuais:
+    - O start_docker.sh execeuta o processo inteiro, ele cria três containers docker com imagem python dentro, inicialza cada um dos três, para cada um ele clona esse projeto, entra na pasta e executa um bash correspondente com os argumentos corretos para cada um dos três slaves. O master é depois desses executado localmente.
+    
+    - Cada bash executa uma instância de um client ou de um master com os argumentos que criam o ambiente de teste acima.
+    
+    - Os containers expõem suas portas para habilitar a comunicação com o master.
+    
+    - Utilize o bash stop_docker.sh para parar todo o processo.
