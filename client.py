@@ -35,8 +35,9 @@ class Client:
                 c.send(str(self.time).encode())
                 self._log("TIME OF "+str(self.time)+" SENT TO MASTER")
             else: # if not
-                newTime = int(re.split(":", msg)[1])
-                if len(newTime) == 2: # handles errors
+                msg_rec = re.split(":", msg)
+                if len(msg_rec) == 2: # handles errors
+                    newTime = int(msg_rec[1])
                     self._log("OLD TIME IS "+str(self.time))
                     # master is providing average to update this slave instance
                     # and so, we split the message in order to get the time
