@@ -56,7 +56,7 @@ class Server:
                 self._log("UPDATED TIME TO "+str(self.time))
 
                 # updating clients' time
-                for slave in filt_slaves:
+                for slave in self.slaves:
                     self._send_time(slave, self.time)
             else:
                 self._log("NOTHING TO UPDATE")

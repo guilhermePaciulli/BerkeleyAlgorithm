@@ -56,12 +56,3 @@ Detalhes do teste:
     - Os logs todos ficam na pasta /test/logs.
 
     - Os resultados com os prints de cada slave e do master deste teste encontram-se em /test/results.
-
-### Teste em máquinas virtuais:
-    - O start_docker.sh execeuta o processo inteiro, ele cria três containers docker com imagem python dentro, inicialza cada um dos três, para cada um ele clona esse projeto, entra na pasta e executa um bash correspondente com os argumentos corretos para cada um dos três slaves. O master é depois desses executado localmente.
-    
-    - Cada bash executa uma instância de um client ou de um master com os argumentos que criam o ambiente de teste acima.
-    
-    - Os containers expõem suas portas para habilitar a comunicação com o master.
-    
-    - Utilize o bash stop_docker.sh para parar todo o processo.
